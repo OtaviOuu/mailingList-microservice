@@ -58,3 +58,68 @@ func emailEntryFromRow(row *sql.Row) (*EmailEntry, error) {
 		OptOut:      optOut,
 	}, nil
 }
+
+func CreateEmail(db *sql.DB, email string) error {
+	_, err := db.Exec(`
+		INSERT INTO emails(email, confirmed_at, opt_out)
+		VALUES(?, 0, false)
+	`, email)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+func GetEmail(db *sql.DB, email string) (*EmailEntry, error) {
+	row := db.QueryRow(`
+		SELECT id, email, confirmed_at, opt_out
+		FROM emails
+		WHERE email = ?
+	`, email)
+
+	emailEntry, err := emailEntryFromRow(row)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println(err)
+			return nil, err
+		}
+		return nil, err
+	}
+	return emailEntry, nil
+}
+
+func UpdateEmail(db *sql.DB, entry *EmailEntry) error {
+	unixTime := entry.ConfirmedAt.Unix()
+
+	_, err := db.Exec(`
+	INSERT INTO
+		emails(emails, confirmed_at, opt_ot)
+			VALUES(?, ?, ?)
+		ON CONFLIT(email) DO UPDATE SET
+			confirmed_at=?
+			opt_out=?
+	`, entry.Email, unixTime, entry.OptOut, unixTime, entry.OptOut)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+func DeleteEmail(db *sql.DB, email string) error {
+	_, err := db.Exec(`
+		UPDATE emails
+			SET opt_out=true
+		WHERE email=?
+	`, email)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
