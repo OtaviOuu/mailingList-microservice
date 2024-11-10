@@ -36,7 +36,6 @@ func TryCreate(db *sql.DB) {
 }
 
 func emailEntryFromRow(row *sql.Row) (*EmailEntry, error) {
-
 	var id int64
 	var email string
 	var confirmedAt int64
@@ -122,4 +121,40 @@ func DeleteEmail(db *sql.DB, email string) error {
 	}
 
 	return nil
+}
+
+type GetEmailBathQueryParams struct {
+	Page  int
+	Count int
+}
+
+func GetEmailBath(db *sql.DB, params GetEmailBathQueryParams) ([]EmailEntry, error) {
+	var empty []EmailEntry
+
+	row, err := db.Query(`
+		SELECT id, email, confirmed_at, opt_out
+		FROM emails
+		WHERE opt_out = false
+		ORDER BY id ASC
+		LIMIT ? OFFSET ?`, params.Count, (params.Page-1)*params.Count)
+
+	if err != nil {
+		log.Println(err)
+		return empty, err
+	}
+	defer row.Close()
+
+	emails := make([]EmailEntry, 0, params.Count)
+
+	for row.Next() {
+		emailRow := new(EmailEntry)
+		err := row.Scan(&emailRow.Id, &emailRow.Email, &emailRow.ConfirmedAt, &emailRow.OptOut)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		emails = append(emails, *emailRow)
+	}
+
+	return emails, nil
 }
