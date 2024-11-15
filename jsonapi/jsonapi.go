@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"structs"
 )
 
 func setJsonHeader(w http.ResponseWriter) {
@@ -14,7 +13,7 @@ func setJsonHeader(w http.ResponseWriter) {
 }
 
 // io.Reader -> qualquer coisa que pode ser lida
-func fromJson[T any](body io.Reader, target T) error {
+func fromJson[T any](body io.Reader, target T) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(body)
 
@@ -54,5 +53,5 @@ func returnErr(w http.ResponseWriter, err error, statusCode int) {
 		}
 		w.WriteHeader(statusCode)
 		return errorMessage, nil
-	}
+	})
 }
