@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"structs"
 )
 
 func setJsonHeader(w http.ResponseWriter) {
@@ -42,4 +43,16 @@ func returnJson[T any](w http.ResponseWriter, withData func() (T, error)) {
 	}
 
 	w.Write(dataJson)
+}
+
+func returnErr(w http.ResponseWriter, err error, statusCode int) {
+	returnJson(w, func() (interface{}, error) {
+		errorMessage := struct {
+			Err string
+		}{
+			Err: err.Error(),
+		}
+		w.WriteHeader(statusCode)
+		return errorMessage, nil
+	}
 }
