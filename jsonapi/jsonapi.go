@@ -144,7 +144,7 @@ func DeleteEmail(db *sql.DB) http.Handler {
 	})
 }
 
-func GetEmailBath(db *sql.DB) http.Handler {
+func GetEmailBathc(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			return
@@ -158,8 +158,8 @@ func GetEmailBath(db *sql.DB) http.Handler {
 		}
 
 		returnJson(w, func() (interface{}, error) {
-			log.Printf("JSON GetEmailBath: %v\n", queryOptions)
-			return mdb.GetEmailBath(db, queryOptions)
+			log.Printf("JSON GetEmailBathc: %v\n", queryOptions)
+			return mdb.GetEmailBathc(db, queryOptions)
 		})
 	})
 }
