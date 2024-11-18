@@ -79,3 +79,24 @@ func CreateEmail(db *sql.DB) http.Handler {
 		})
 	})
 }
+
+func GetEmail(db *sql.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			return
+		}
+
+		entry := mdb.EmailEntry{}
+		fromJson(r.Body, &entry)
+
+		if err := mdb.CreateEmail(db, entry.Email); err != nil {
+			returnErr(w, err, 400)
+			return
+		}
+
+		returnJson(w, func() (interface{}, error) {
+			log.Printf("Json GetEmail: %v\n", entry.Email)
+			return mdb.GetEmail(db, entry.Email)
+		})
+	})
+}
