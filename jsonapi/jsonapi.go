@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -139,6 +140,26 @@ func DeleteEmail(db *sql.DB) http.Handler {
 		returnJson(w, func() (interface{}, error) {
 			log.Printf("JSON DeleteEmail: %v\n", entry.Email)
 			return mdb.GetEmail(db, entry.Email)
+		})
+	})
+}
+
+func GetEmailBath(db *sql.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			return
+		}
+
+		queryOptions := mdb.GetEmailBathQueryParams{}
+		fromJson(r.Body, &queryOptions)
+
+		if queryOptions.Count <= 0 || queryOptions.Page <= 0 {
+			returnErr(w, errors.New("erro na paginação, aaaaaaaaaa. Page, coutn > 0"), 400)
+		}
+
+		returnJson(w, func() (interface{}, error) {
+			log.Printf("JSON GetEmailBath: %v\n", queryOptions)
+			return mdb.GetEmailBath(db, queryOptions)
 		})
 	})
 }
