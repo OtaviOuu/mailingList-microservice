@@ -163,3 +163,15 @@ func GetEmailBathc(db *sql.DB) http.Handler {
 		})
 	})
 }
+
+func Serve(db *sql.DB, bind string) {
+	http.Handle("/email/create", CreateEmail(db))
+	http.Handle("/email/get", GetEmail(db))
+	http.Handle("/email/update", UpdateEmail(db))
+	http.Handle("/email/delete", DeleteEmail(db))
+	http.Handle("/email/batch", GetEmailBathc(db))
+	err := http.ListenAndServe(bind, nil)
+	if err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+}
