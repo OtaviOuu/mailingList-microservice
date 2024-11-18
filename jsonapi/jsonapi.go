@@ -159,7 +159,7 @@ func GetEmailBathc(db *sql.DB) http.Handler {
 
 		returnJson(w, func() (interface{}, error) {
 			log.Printf("JSON GetEmailBathc: %v\n", queryOptions)
-			return mdb.GetEmailBathc(db, queryOptions)
+			return mdb.GetEmailBatch(db, queryOptions)
 		})
 	})
 }

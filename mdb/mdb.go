@@ -128,7 +128,7 @@ type GetEmailBathQueryParams struct {
 	Count int
 }
 
-func GetEmailBathc(db *sql.DB, params GetEmailBathQueryParams) ([]EmailEntry, error) {
+func GetEmailBatch(db *sql.DB, params GetEmailBathQueryParams) ([]EmailEntry, error) {
 	var empty []EmailEntry
 
 	row, err := db.Query(`
