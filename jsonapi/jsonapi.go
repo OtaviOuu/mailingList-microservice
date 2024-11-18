@@ -2,10 +2,13 @@ package jsonapi
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/OtaviOuu/mailingList-microservice/mdb"
 )
 
 func setJsonHeader(w http.ResponseWriter) {
@@ -53,5 +56,26 @@ func returnErr(w http.ResponseWriter, err error, statusCode int) {
 		}
 		w.WriteHeader(statusCode)
 		return errorMessage, nil
+	})
+}
+
+func CreateEmail(db *sql.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			return
+		}
+
+		entry := mdb.EmailEntry{}
+		fromJson(r.Body, &entry)
+
+		if err := mdb.CreateEmail(db, entry.Email); err != nil {
+			returnErr(w, err, 400)
+			return
+		}
+
+		returnJson(w, func() (interface{}, error) {
+			log.Printf("Json CreateEmail: %v\n", entry.Email)
+			return mdb.GetEmail(db, entry.Email)
+		})
 	})
 }
