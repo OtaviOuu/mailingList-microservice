@@ -30,12 +30,12 @@ func returnJson[T any](w http.ResponseWriter, withData func() (T, error)) {
 	data, err := withData()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ErrJson, err := json.Marshal(&err)
+		serverErrJson, err := json.Marshal(&err)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		w.Write(ErrJson)
+		w.Write(serverErrJson)
 	}
 
 	dataJson, err := json.Marshal(&data)
@@ -170,6 +170,7 @@ func Serve(db *sql.DB, bind string) {
 	http.Handle("/email/update", UpdateEmail(db))
 	http.Handle("/email/delete", DeleteEmail(db))
 	http.Handle("/email/batch", GetEmailBathc(db))
+	log.Printf("Json api Listening on %s", bind)
 	err := http.ListenAndServe(bind, nil)
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)

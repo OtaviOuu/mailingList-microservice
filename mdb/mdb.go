@@ -15,6 +15,7 @@ type EmailEntry struct {
 	OptOut      bool
 }
 
+// Não sei tratar bem esses erros ainda :(
 func TryCreate(db *sql.DB) {
 	_, err := db.Exec(`
 		CREATE TABLE emails (
@@ -28,9 +29,10 @@ func TryCreate(db *sql.DB) {
 		if sqlError, ok := err.(sqlite3.Error); ok {
 			// code == 1 <-> db já existe
 			if sqlError.Code != 1 {
-				log.Fatal(sqlError)
+				log.Println(sqlError)
+
 			}
-			log.Fatal(err)
+			log.Println(err)
 		}
 	}
 }
